@@ -1,0 +1,3 @@
+[submodule "third-party/ICPCUDA"]
+	path = third-party/ICPCUDA
+	url = https://github.com/leoneed03/ICPCUDA.git
