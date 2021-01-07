@@ -44,7 +44,7 @@ include(ExternalProject)
 ExternalProject_Add(icpCuda
     SOURCE_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA"
     BINARY_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/gbuild"
-    CONFIGURE_COMMAND cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-6
+    CONFIGURE_COMMAND cmake .. #-DCMAKE_C_COMPILER=/usr/bin/gcc-6
     INSTALL_COMMAND "")
 
 #if(${DEBUG_PRINT_PROGRESS})
