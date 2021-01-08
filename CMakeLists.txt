@@ -16,6 +16,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 #find_package(GLEW REQUIRED)
 #find_package(CUDA REQUIRED)
 #find_package(Sophus REQUIRED)
+
+set(local_custom_Pangolin_INSTALL_DIR _installed_Pangolin)
+set(custom_Pangolin_BUILD_NAME g-build)
+
 find_package(Eigen3 REQUIRED)
 
 find_package(
@@ -26,10 +30,10 @@ find_package(
 #find_package(Pangolin REQUIRED)
 
 set(ICPCUDA_PROJECT_PATH ${PROJECT_SOURCE_DIR}/third-party/ICPCUDA)
-set(ICPCUDA_LIBS ${ICPCUDA_PROJECT_PATH}/gbuild/libICP.so)
+set(ICPCUDA_LIBS ${ICPCUDA_PROJECT_PATH}/${custom_Pangolin_BUILD_NAME}/libICP.so)
 set(ICPCUDA_third_party ${ICPCUDA_PROJECT_PATH}/third-party)
 
-set(Pangolin_INSTALL_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/pinstall" CACHE PATH "Pangolin install directory")
+set(Pangolin_INSTALL_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/${custom_Pangolin_BUILD_NAME}/${local_custom_Pangolin_INSTALL_DIR}" CACHE PATH "Pangolin install directory")
 set(Pangolin_INCLUDE_DIRS "${Pangolin_INSTALL_DIR}/include")
 
 
@@ -42,8 +46,9 @@ include(ExternalProject)
 
 ExternalProject_Add(icpCuda
     SOURCE_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA"
-    BINARY_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/gbuild"
-    CONFIGURE_COMMAND cmake ..
+    BINARY_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/${custom_Pangolin_BUILD_NAME}"
+    CMAKE_ARGS -DPangolin_LOCAL_INSTALL_DIR=${local_custom_Pangolin_INSTALL_DIR}
+    -DPangolin_BUILD_NAME=${custom_Pangolin_BUILD_NAME}
     INSTALL_COMMAND "")
 
 find_package(CUDA REQUIRED)
