@@ -25,21 +25,20 @@ find_package(
 
 #find_package(Pangolin REQUIRED)
 
-set(icpCudaPath ${PROJECT_SOURCE_DIR}/third-party/ICPCUDA)
-set(icp_LIBS ${icpCudaPath}/gbuild/libICP.so)
+set(ICPCUDA_PROJECT_PATH ${PROJECT_SOURCE_DIR}/third-party/ICPCUDA)
+set(ICPCUDA_LIBS ${ICPCUDA_PROJECT_PATH}/gbuild/libICP.so)
+set(ICPCUDA_third_party ${ICPCUDA_PROJECT_PATH}/third-party)
 
-set(ICP_third_party ${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/third-party)
-set(Pangolin_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/third-party/Pangolin/include")
-set(Sophus_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/third-party/Sophus")
-set(Pangolin_CUSTOM_INCLUDE_DIR ${ICP_third_party}/Pangolin/gbuild/src/include)
-include_directories(${Sophus_INCLUDE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/include)
+set(Pangolin_INSTALL_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/pinstall" CACHE PATH "Pangolin install directory")
+set(Pangolin_INCLUDE_DIRS "${Pangolin_INSTALL_DIR}/include")
 
-include_directories(${Pangolin_CUSTOM_INCLUDE_DIR})
-include_directories(${Pangolin_INCLUDE_DIR})
-#add_subdirectory(${icpCudaPath})
+
+#set(Pangolin_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/third-party/Pangolin/include")
+set(Sophus_INCLUDE_DIRS ${ICPCUDA_third_party}/Sophus)
+
+set(ICPCUDA_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA/include")
+
 include(ExternalProject)
-
 
 ExternalProject_Add(icpCuda
     SOURCE_DIR "${PROJECT_SOURCE_DIR}/third-party/ICPCUDA"
@@ -47,75 +46,23 @@ ExternalProject_Add(icpCuda
     CONFIGURE_COMMAND cmake ..
     INSTALL_COMMAND "")
 
-#if(${DEBUG_PRINT_PROGRESS})
-#  list(APPEND GDR_FLAGS "-DDEBUG_PRINT_PROGRESS")
-#endif()
-#
-#set(SIFTGPU_LIBS ${PROJECT_SOURCE_DIR}/siftgpu/bin/libsiftgpu.so)
-# set(GTSAM_LIBS ${PROJECT_SOURCE_DIR}/third-party/gtsam/gbuild/lib/libgtsam.a)
-# set(GTSAM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third-party/gtsam/gbuild/include)
-
-#set(GDR_HEADER_FILES
-#    ${PROJECT_SOURCE_DIR}/include/keyFeatures.h
-#    ${PROJECT_SOURCE_DIR}/include/fileProc.h
-#    ${PROJECT_SOURCE_DIR}/include/VertexCG.h
-#    ${PROJECT_SOURCE_DIR}/include/CorrespondenceGraph.h
-#    ${PROJECT_SOURCE_DIR}/include/transformationRt.h
-#    ${PROJECT_SOURCE_DIR}/include/cameraRGBD.h
-#    ${PROJECT_SOURCE_DIR}/include/siftModule.h
-#    ${PROJECT_SOURCE_DIR}/include/groundTruthTransformer.h
-#    ${PROJECT_SOURCE_DIR}/include/rotationAveraging.h
-#    ${PROJECT_SOURCE_DIR}/include/quaternions.h
-#    ${PROJECT_SOURCE_DIR}/include/umeyama.h
-#    ${PROJECT_SOURCE_DIR}/include/poseEstimation.h
-#    ${PROJECT_SOURCE_DIR}/include/printer.h
-#    ${PROJECT_SOURCE_DIR}/include/errors.h)
-#
-#set(GDR_SOURCE_FILES
-#    ${PROJECT_SOURCE_DIR}/src/keyFeatures.cpp
-#    ${PROJECT_SOURCE_DIR}/src/fileProc.cpp
-#    ${PROJECT_SOURCE_DIR}/src/VertexCG.cpp
-#    ${PROJECT_SOURCE_DIR}/src/CorrespondenceGraph.cpp
-#    ${PROJECT_SOURCE_DIR}/src/transformationRt.cpp
-#    ${PROJECT_SOURCE_DIR}/src/cameraRGBD.cpp
-#    ${PROJECT_SOURCE_DIR}/src/siftModule.cpp
-#    ${PROJECT_SOURCE_DIR}/src/groundTruthTransformer.cpp
-#    ${PROJECT_SOURCE_DIR}/src/rotationAveraging.cpp
-#    ${PROJECT_SOURCE_DIR}/src/quaternions.cpp
-#    ${PROJECT_SOURCE_DIR}/src/umeyama.cpp
-#    ${PROJECT_SOURCE_DIR}/src/poseEstimation.cpp)
-
-#add_library(GDR_LIB SHARED ${GDR_SOURCE_FILES} ${GDR_HEADER_FILES})
-#
-#add_dependencies(GDR_LIB siftgpu # gtsam
-#    )
-#
-#target_compile_definitions(GDR_LIB PUBLIC ${GDR_FLAGS})
-#
-#target_link_libraries(
-#    GDR_LIB
-#    ${CUDA_LIBRARIES}
-#    ${SIFTGPU_LIBS}
-#    ${OpenCV_LIBS}
-#    # ${GTSAM_LIBS}
-#    ${Boost_LIBRARIES}
-#    ${METIS_LIBRARIES}
-#    ${TBB_LIBRARIES})
-#
-#target_include_directories(
-#    GDR_LIB
-#    PUBLIC # ${GTSAM_INCLUDE_DIRS}
-#    ${PROJECT_SOURCE_DIR}/include ${EIGEN3_INCLUDE_DIRS}
-#    ${PROJECT_SOURCE_DIR}/siftgpu/src/SiftGPU
-#    PRIVATE ${OpenGL_INCLUDE_DIR})
-
-#include_directories(icpCudaPath)
 find_package(CUDA REQUIRED)
 
-include_directories(${EIGEN3_INCLUDE_DIRS})
 add_executable(main main.cpp)
 add_dependencies(main icpCuda)
 
-set(Pangolin_DIR "${ICP_third_party}/Pangolin/gbuild/src" CACHE PATH "Pangolin build directory")
-set(Pangolin_LIBRARIES ${Pangolin_DIR}/libpangolin.so)
-target_link_libraries(main ${icp_LIBS} ${Pangolin_LIBRARIES} ${CUDA_LIBRARIES})
+set(Pangolin_LIBRARIES ${Pangolin_INSTALL_DIR}/lib/libpangolin.so)
+
+target_link_libraries(main
+    ${ICPCUDA_LIBS}
+    ${Pangolin_LIBRARIES}
+    ${CUDA_LIBRARIES}
+    )
+
+target_include_directories(main
+    PUBLIC
+    ${Sophus_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
+    ${ICPCUDA_INCLUDE_DIRS}
+    ${Pangolin_INCLUDE_DIRS}
+    )
